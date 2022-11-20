@@ -16,6 +16,8 @@ const LoginPage = () => {
   const { auth, setAuth } = useAuthContext()
   const { width: screenWidth } = useScreen()
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     spotifyAuthentication()
   }, [window.location.search])
@@ -44,6 +46,8 @@ const LoginPage = () => {
       // Request It's OK
       if (response?.status === 200) {
         const { access_token, refresh_token } = response.data
+
+        navigate('/artists')
 
         // Set data to Auth context state
         return setAuth({ isAuth: true, accessToken: access_token, refreshToken: refresh_token })
@@ -77,11 +81,11 @@ const LoginPage = () => {
     <>
       <Header />
 
-      <div className="mt-24 pb-24 flex flex-col items-center md:items-start md:px-20 md:pb-24 lg:grid lg:grid-cols-2 gap-4">
+      <div className="mt-24 pb-24 flex flex-col items-center md:items-start md:px-20 lg:grid lg:grid-cols-2 gap-4">
         <ArrowIcon {...arrowIconStyle}  />
 
         <div className="mt-7 md:mt-20 lg:mt-0">
-          <h1 className="text-4xl font-bold md:text-6xl xl:">
+          <h1 className="text-4xl font-bold md:text-6xl">
             <span className='text-white'>Disfruta de la</span><br /><span style={{ color: '#D6F379' }}>mejor música</span>
           </h1>
 

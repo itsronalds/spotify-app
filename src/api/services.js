@@ -28,3 +28,54 @@ export const spotifyLoginAPI = async (requiredParams) => {
     return error
   }
 }
+
+export const searchArtistByParamsAPI = async (queries, token) => {
+  try {    
+    //- Request URL
+    const url = new URL('https://api.spotify.com/v1/search')
+    
+    //- Request queries
+    for (const element of queries) {
+      const key = Object.keys(element)[0]
+      url.searchParams.append(key, element[key])
+    }
+
+    const request = await fetch(url, {
+      method: 'GET',
+      url,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+
+    return request.json()
+  } catch (error) {
+    return error
+  }
+}
+
+export const albumsByArtistAPI = async (queries, artistId, token) => {
+  try {
+    const url = new URL(`https://api.spotify.com/v1/artists/${artistId}/albums`)
+
+    //- Request queries
+    for (const element of queries) {
+      const key = Object.keys(element)[0]
+      url.searchParams.append(key, element[key])
+    }
+
+    const request = await fetch(url, {
+      method: 'GET',
+      url,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+
+    return request.json()
+  } catch (error) {
+    return error
+  }
+}
