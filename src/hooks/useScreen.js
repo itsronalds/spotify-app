@@ -1,25 +1,20 @@
 import { useState, useEffect } from 'react'
 
-const initialState = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-}
-
 const useScreen = () => {
-  const [screenProps, setScreenProps] = useState(initialState)
+  const { width, height } = window.screen
+  const [screenProps, setScreenProps] = useState({ width, height })
 
   const screenPropsListener = () => {
-    const { innerWidth, innerHeight } = window
+    const { width, height } = window.screen
 
     // set window props to state
-    setScreenProps({ width: innerWidth, height: innerHeight })
+    setScreenProps({ width, height })
   }
 
   useEffect(() => {
-    window.addEventListener('resize', screenPropsListener);
-
+    window.addEventListener('resize', screenPropsListener)
     return () => {
-      window.removeEventListener('resize', screenPropsListener);
+      window.removeEventListener('resize', screenPropsListener)
     };
   }, [])
 
