@@ -10,6 +10,10 @@ const Header = ({ links }) => {
   const { auth: { isAuth } } = useAuthContext()
   const { width: screenWidth } = useScreen()
 
+  const logout = () => {
+    window.location.href = '/'
+  }
+
   return (
     <>
       {!isAuth && (
@@ -38,7 +42,7 @@ const Header = ({ links }) => {
 
               <div className='w-0.5 bg-white' />
 
-              <div className='flex justify-center items-center cursor-pointer'>
+              <div className='flex justify-center items-center cursor-pointer' onClick={logout}>
                 {screenWidth < 768 ? <LogoutIcon /> : 'Cerrar sesión'}
               </div>
 

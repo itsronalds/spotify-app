@@ -19,6 +19,11 @@ const LoginPage = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // Remove saved albums artists 
+    window.localStorage.clear()
+  }, [])
+
+  useEffect(() => {
     spotifyAuthentication()
   }, [window.location.search])
 
