@@ -24,7 +24,7 @@ const artistInitialState = {
   total: 0
 }
 
-const links = [{ name: 'Buscar', path: '/artists', status: true }, { name: 'My albums', path: '/', status: false },]
+const links = [{ name: 'Buscar', path: '/artists', status: true }, { name: 'My albums', path: '/my-albums', status: false },]
 
 const Artists = () => {
   const { auth: { accessToken } } = useAuthContext()
@@ -158,7 +158,7 @@ const Artists = () => {
     <>
       <Header links={links} />
       
-      <div className='px-6 py-6 md:flex md:flex-col'>
+      <div className='p-6 md:flex md:flex-col'>
         <div className='md:text-center'>
           <h1 className="mt-5 text-4xl font-bold md:text-6xl">
             <span className='text-white'>Busca tus</span><br /><span style={{ color: '#D6F379' }}>artistas</span>
@@ -270,6 +270,7 @@ const Artists = () => {
                     })}
 
                   </div>
+                  
                   {artist.artistAlbums.length > 0 && (
                     <div className='mt-12'>
                       <Pagination 
