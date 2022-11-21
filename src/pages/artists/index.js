@@ -11,6 +11,7 @@ import ReactPaginate from 'react-paginate';
 import PaginationArrowRight from '../../assets/icons/PaginationArrowRight'
 import PaginationArrowLeft from '../../assets/icons/PaginationArrowLeft'
 import Button from '../../components/button'
+import Pagination from '../../components/pagination'
 
 import { searchArtistByParamsAPI, albumsByArtistAPI } from '../../api/services'
 
@@ -214,28 +215,10 @@ const Artists = () => {
 
                   {artistsList.artists.length > 0 && (
                     <div className='mt-8 md:mt-12 flex justify-center md:justify-start'>
-                      <ReactPaginate
-                        // initialPage={currentPage}
-                        forcePage={currentPage}
-                        pageCount={pageCount}
-                        pageRangeDisplayed={3}
-                        marginPagesDisplayed={1}
-                        nextLabel={<PaginationArrowRight />}
-                        previousLabel={<PaginationArrowLeft />}
-                        pageClassName="page-item"
-                        previousClassName="page-item"
-                        nextClassName="page-item"
-                        breakLabel="..."
-                        breakClassName="page-item"
-                        containerClassName="pagination"
-                        activeClassName="active"
-                        onPageChange={handlePagination}
-                        renderOnZeroPageCount={null}
-                        // renderOnZeroPageCount={false}
-                        // pageLinkClassName="page-link"
-                        // previousLinkClassName="page-link"
-                        // nextLinkClassName="page-link"
-                        // breakLinkClassName="page-link"
+                      <Pagination 
+                        currentPage={currentPage} 
+                        pageCount={pageCount} 
+                        onChange={handlePagination} 
                       />
                     </div>
                   )}
@@ -287,31 +270,13 @@ const Artists = () => {
                   </div>
                   {artist.artistAlbums.length > 0 && (
                     <div className='mt-12'>
-                      <ReactPaginate
-                        // initialPage={currentPage}
-                        forcePage={currentPage}
-                        pageCount={pageCount}
-                          pageRangeDisplayed={3}
-                          marginPagesDisplayed={1}
-                          nextLabel={<PaginationArrowRight />}
-                          previousLabel={<PaginationArrowLeft />}
-                          pageClassName="page-item"
-                          previousClassName="page-item"
-                          nextClassName="page-item"
-                          breakLabel="..."
-                          breakClassName="page-item"
-                          containerClassName="pagination"
-                          activeClassName="active"
-                          onPageChange={handlePagination}
-                          renderOnZeroPageCount={null}
-                          // renderOnZeroPageCount={false}
-                          // pageLinkClassName="page-link"
-                          // previousLinkClassName="page-link"
-                          // nextLinkClassName="page-link"
-                          // breakLinkClassName="page-link"
-                        />
-                      </div>
-                    )}
+                      <Pagination 
+                        currentPage={currentPage} 
+                        pageCount={pageCount} 
+                        onChange={handlePagination} 
+                      />
+                    </div>
+                  )}
                 </>
               )}
 
