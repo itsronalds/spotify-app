@@ -25,6 +25,8 @@ const artistInitialState = {
   total: 0
 }
 
+const links = [{ name: 'Buscar', path: '', status: true }, { name: 'My albums', path:'', status: false },]
+
 const Artists = () => {
   const { auth: { accessToken } } = useAuthContext()
   const [searchText, setSearchText] = useState('')
@@ -154,7 +156,7 @@ const Artists = () => {
 
   return (
     <>
-      <Header />
+      <Header links={links} />
       
       <div className='px-6 py-6 md:flex md:flex-col'>
         <div className='md:text-center'>

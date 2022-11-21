@@ -84,3 +84,18 @@ body {
     transform: rotate(360deg);
   }
 }
+
+/* ----------------------- End of Loader ---------------------------------------------------- */
+
+.react-logo {
+  animation: react-logo 4s linear infinite;
+}
+
+@keyframes react-logo {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
