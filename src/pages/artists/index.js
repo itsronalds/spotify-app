@@ -28,7 +28,7 @@ const links = [{ name: 'Buscar', path: '/artists', status: true }, { name: 'My a
 
 const Artists = () => {
   const { auth: { accessToken } } = useAuthContext()
-  const { albums, setAlbum, removeAlbum } = useStorageContext()
+  const { albumsByArtists, setAlbum, removeAlbum } = useStorageContext()
   const [searchText, setSearchText] = useState('')
 
   // Loader state
@@ -237,7 +237,12 @@ const Artists = () => {
                       const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
                       const url = images?.[0]?.url || notFoundImageUrl
 
-                      const albumIsAdded = albums.some((element) => element.id === id)
+                      const artistIndex = albumsByArtists.findIndex((element) => element.artistId === artist.artistId)
+                      let albumIsAdded = false
+                      
+                      if (artistIndex !== -1) {
+                        albumIsAdded = albumsByArtists[artistIndex].albums.some((element) => element.id === id)
+                      }
 
                       return (
                         <AlbumCard key={id} id={id} image={url} name={name} publishedDate={release_date}>
@@ -246,7 +251,7 @@ const Artists = () => {
                               classname='mt-6' 
                               backgroundColor='#D6F379' 
                               color='#000' 
-                              onClick={() => setAlbum(album)}>
+                              onClick={() => setAlbum(artist.artistId, artist.artistName, album)}>
                                 + Add album
                             </Button>
                           )}
@@ -256,7 +261,7 @@ const Artists = () => {
                               classname='mt-6' 
                               backgroundColor='#E3513D' 
                               color='#fff' 
-                              onClick={() => removeAlbum(album)}>
+                              onClick={() => removeAlbum(artist.artistId, album)}>
                                 - Remove album
                             </Button>
                           )}

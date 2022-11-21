@@ -3,36 +3,49 @@ import { createContext, useContext, useEffect, useState } from 'react'
 const StoreContext = createContext(null)
 
 export const StoreContextProvider = ({ children }) => {
-  const [albums, setAlbums] = useState([])
+  const [albumsByArtists, setAlbumsByArtists] = useState([])
 
   useEffect(() => {
     albumsFromLocalStorage()
   }, [])
 
   const albumsFromLocalStorage = () => {
-    const albums = window.localStorage.getItem('artistsAlbums') ? JSON.parse(window.localStorage.getItem('artistsAlbums')) : []
+    const albumsByArtists = window.localStorage.getItem('albumsByArtists') ? JSON.parse(window.localStorage.getItem('albumsByArtists')) : []
 
-    if (albums?.length > 0) {
-      setAlbums(albums)
+    if (albumsByArtists?.length > 0) {
+      setAlbumsByArtists(albumsByArtists)
     }
   }
 
-  const setAlbum = (album) => {
-    const albums = window.localStorage.getItem('artistsAlbums') ? JSON.parse(window.localStorage.getItem('artistsAlbums')) : []
-    albums.push(album)
+  const setAlbum = (artistId, artistName, album) => {
+    const albumsByArtists = window.localStorage.getItem('albumsByArtists') ? JSON.parse(window.localStorage.getItem('albumsByArtists')) : []
+    const index = albumsByArtists.findIndex((element) => element.artistId === artistId)
+    
+    if (index === -1) {
+      albumsByArtists.push({ artistId, artistName, albums: [album] })
+    } else {
+      albumsByArtists[index].albums.push(album)
+    }
 
-    window.localStorage.setItem('artistsAlbums', JSON.stringify(albums))
-    setAlbums(albums)
+    window.localStorage.setItem('albumsByArtists', JSON.stringify(albumsByArtists))
+    setAlbumsByArtists(albumsByArtists)
   }
 
-  const removeAlbum = (album) => {
-    const filterAlbums = albums.filter((element)  => element.id !== album.id)
+  const removeAlbum = (artistId, album) => {
+    const artistIndex = albumsByArtists.findIndex((element) => element.artistId === artistId)
 
-    window.localStorage.setItem('artistsAlbums', JSON.stringify(filterAlbums))
-    setAlbums(filterAlbums)
+    if (artistIndex === -1) {
+      return
+    }
+
+    const mapped = albumsByArtists.map((artist) => artist.artistId === artistId ? { ...artist, albums: [...artist.albums].filter((element) => element.id !== album.id) } : artist)
+    const filterArtistsWithoutAlbums = mapped.filter((element) => element.albums.length !== 0)
+
+    window.localStorage.setItem('albumsByArtists', JSON.stringify(filterArtistsWithoutAlbums))
+    setAlbumsByArtists(filterArtistsWithoutAlbums)
   }
 
-  const value = { albums, setAlbum, removeAlbum }
+  const value = { albumsByArtists, setAlbum, removeAlbum }
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }
