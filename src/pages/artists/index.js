@@ -213,7 +213,7 @@ const Artists = () => {
                   </div>
 
                   {artistsList.artists.length > 0 && (
-                    <div className='mt-12'>
+                    <div className='mt-8 md:mt-12 flex justify-center md:justify-start'>
                       <ReactPaginate
                         // initialPage={currentPage}
                         forcePage={currentPage}
