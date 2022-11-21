@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 
 const useScreen = () => {
-  const { width, height } = window.screen
+  const { innerWidth: width, innerHeight: height } = window
   const [screenProps, setScreenProps] = useState({ width, height })
 
   const screenPropsListener = () => {
-    const { width, height } = window.screen
+    const { innerWidth: width, innerHeight: height } = window
 
     // set window props to state
     setScreenProps({ width, height })
