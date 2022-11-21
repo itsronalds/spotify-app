@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { useAuthContext } from '../../contexts/auth'
+import { useStorageContext } from '../../contexts/store'
 
 import Header from '../../components/header'
 import ArtistCard from '../../components/artistCard'
@@ -25,10 +26,11 @@ const artistInitialState = {
   total: 0
 }
 
-const links = [{ name: 'Buscar', path: '', status: true }, { name: 'My albums', path:'', status: false },]
+const links = [{ name: 'Buscar', path: '/artists', status: true }, { name: 'My albums', path: '/', status: false },]
 
 const Artists = () => {
   const { auth: { accessToken } } = useAuthContext()
+  const { albums, setAlbum, removeAlbum } = useStorageContext()
   const [searchText, setSearchText] = useState('')
 
   // Loader state
@@ -241,6 +243,8 @@ const Artists = () => {
                 </>
               )}
 
+              {/* ------------------------ Display albums by Artist ------------------------ */}
+
               {artist.artistId && (
                 <>
                   <span className='block mt-11 leading-8 text-white'>
@@ -248,13 +252,34 @@ const Artists = () => {
                   </span>
 
                   <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-20 xl:gap-4 justify-items-center content-center'>
-                    {artist.artistAlbums.map(({ id, images, name, release_date }) => {
+                    {artist.artistAlbums.map((album) => {
+                      const { id, images, name, release_date } = album
                       const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
                       const url = images?.[0]?.url || notFoundImageUrl
 
+                      const albumIsAdded = albums.some((element) => element.id === id)
+
                       return (
                         <AlbumCard key={id} id={id} image={url} name={name} publishedDate={release_date}>
-                          <Button classname='mt-6' backgroundColor='#D6F379' color='#000'>+ Add album</Button>
+                          {!albumIsAdded && (
+                            <Button 
+                              classname='mt-6' 
+                              backgroundColor='#D6F379' 
+                              color='#000' 
+                              onClick={() => setAlbum(album)}>
+                                + Add album
+                            </Button>
+                          )}
+
+                          {albumIsAdded && (
+                             <Button 
+                              classname='mt-6' 
+                              backgroundColor='#E3513D' 
+                              color='#fff' 
+                              onClick={() => removeAlbum(album)}>
+                                - Remove album
+                            </Button>
+                          )}
                         </AlbumCard>
                       )
                     })}

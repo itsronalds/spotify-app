@@ -8,7 +8,6 @@ import { useAuthContext } from '../../contexts/auth'
 
 const Header = ({ links }) => {
   const { auth: { isAuth } } = useAuthContext()
-  console.log(isAuth)
   const { width: screenWidth } = useScreen()
 
   return (
