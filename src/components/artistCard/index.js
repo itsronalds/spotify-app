@@ -1,6 +1,6 @@
-const ArtistCard = ({ id, image, name, followers, getAlbums }) => {
+const ArtistCard = ({ image, name, followers, onClick }) => {
     return (
-      <div className="artist-card transition-all p-6 rounded-3xl text-white cursor-pointer hover:text-black hover:-translate-y-2" onClick={() => getAlbums(id, name)}>
+      <div className="artist-card transition-all p-6 rounded-3xl text-white cursor-pointer hover:text-black hover:-translate-y-2" onClick={onClick}>
         <div>
           <img className="rounded-xl object-cover" style={{ minWidth: 272, minHeight: 241, maxWidth: 272, maxHeight: 241 }} src={image} alt={name} />
         </div>
