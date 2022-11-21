@@ -18,15 +18,15 @@ const Header = ({ links }) => {
     <>
       {!isAuth && (
         <header className="p-6 md:px-20">
-          <span className="text-3xl font-semibold text-white">Music App</span>
+          <Link to='/'><span className="text-3xl font-semibold text-white">Music App</span></Link>
         </header>
       )}
 
       {isAuth && (
         <header className="p-6 md:px-20 flex justify-between items-center">
           {screenWidth < 768 
-            ? <img className='react-logo h-14 object-fit' src={reactLogo} alt="Logo" /> 
-            : <span className="text-3xl font-semibold text-white">Music App</span>
+            ? <Link to={isAuth ? '/artists' : '/'}><img className='react-logo h-14 object-fit' src={reactLogo} alt="Logo" /> </Link>
+            : <Link to={isAuth ? '/artists' : '/'}><span className="text-3xl font-semibold text-white">Music App</span></Link>
           }
 
           <nav>
