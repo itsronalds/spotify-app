@@ -1,8 +1,9 @@
 /* -------------------------------------------- Start of Spotify credentials -------------------------------------------- */
-const SPOTIFY_CLIENT_ID = 'b966274967604dc7be8e2dfe01602a2e'
-const SPOTIFY_CLIENT_SECRET = '175b78cff0db4576bc6ca4eebf8f212d'
-const SPOTIFY_REDIRECT_URL = 'http://localhost:3000/'
-const SPOTIFY_REQUEST_URL = `https://accounts.spotify.com/authorize?client_id=${SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${SPOTIFY_REDIRECT_URL}&scope=user-read-private`
+
+const SPOTIFY_CLIENT_ID     = process.env.REACT_APP_SPOTIFY_CLIENT_ID
+const SPOTIFY_CLIENT_SECRET = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET
+const SPOTIFY_REDIRECT_URL  = process.env.REACT_APP_SPOTIFY_REDIRECT_URL
+const SPOTIFY_REQUEST_URL   = process.env.REACT_APP_SPOTIFY_REQUEST_URL
 
 /* -------------------------------------------- End of Spotify credentials   -------------------------------------------- */
 
