@@ -51,6 +51,14 @@ const ArtistDetails = ({ id: artistId, name: artistName, followers, image }) => 
 
     setIsLoading(false)
 
+    if (response?.error) {
+      const { status } = response.error
+
+      if (status === 401 || status === 403) {
+        window.location.href = '/'
+      }
+    }
+
     if (response?.items?.length) {
       const { items: albums, total } = response
       setData({ albums, total })

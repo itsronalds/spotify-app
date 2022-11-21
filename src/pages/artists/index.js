@@ -51,6 +51,9 @@ const Artists = () => {
   /* Screen custom hook */
   const { width: screenWidth } = useScreen()
 
+  /* Previous width size */
+  const [previousScreenWidth, setPreviousScreenWidth] = useState(screenWidth)
+
   const [data, setData] = useState(initialDataState)
 
   /* Search artists by text state */
@@ -79,11 +82,15 @@ const Artists = () => {
   }, [data.artist.id])
 
   useEffect(() => {
-    if (screenWidth < 768 && currentPage !== 0) {
-        searchAlbumsByArtistId(true)
-    } else {
-        searchArtistsByParams(true)
+    let thread = true
+
+    if (thread && screenWidth < 768 && previousScreenWidth >= 768) {
+      searchAlbumsByArtistId(true)
+    } else if (thread && screenWidth >= 768 && previousScreenWidth < 768) {
+      searchArtistsByParams(true)
     }
+
+    return () => thread = false
   }, [screenWidth])
 
   const handleRequest = () => {
@@ -117,6 +124,17 @@ const Artists = () => {
     const response = await searchArtistsByParamsAPI(params, accessToken)
 
     setIsLoading(false)
+
+    /* When request is finished set current screen width */
+    setPreviousScreenWidth(screenWidth)
+
+    if (response?.error) {
+      const { status } = response.error
+
+      if (status === 401 || status === 403) {
+        window.location.href = '/'
+      }
+    }
 
     if (response?.artists?.items?.length) {
       const { artists: { items, total } } = response
@@ -154,6 +172,17 @@ const Artists = () => {
     const response = await albumsByArtistIdAPI(params, data.artist.id, accessToken)
     
     setIsLoading(false)
+
+    /* When request is finished set current screen width */
+    setPreviousScreenWidth(screenWidth)
+
+    if (response?.error) {
+      const { status } = response.error
+
+      if (status === 401 || status === 403) {
+        window.location.href = '/'
+      }
+    }
     
     if (response?.items?.length) {
       const { items, total } = response
