@@ -201,7 +201,7 @@ const Artists = () => {
                     </span>
                   )}
                   
-                  <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-20 xl:gap-4 justify-items-center content-center'>
+                  <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-18 justify-items-center content-center'>
                     {artistsList.artists.slice(offset, limit).map(({ id, name, followers: { total }, images }) => {
                       const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
                       const url = images?.[0]?.url || notFoundImageUrl
