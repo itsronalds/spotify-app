@@ -1,294 +1,278 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
+import useScreen from '../../hooks/useScreen'
 
 import { useAuthContext } from '../../contexts/auth'
 import { useStorageContext } from '../../contexts/store'
 
-import Header from '../../components/header'
-import ArtistCard from '../../components/artistCard'
-import AlbumCard from '../../components/albumCard'
+import Header from "../../components/header"
 import Loader from '../../components/loader'
+import AlbumCard from '../../components/albumCard'
+import ArtistCard from '../../components/artistCard'
+import ArtistDetails from '../../components/artistDetails'
 import Button from '../../components/button'
 import Pagination from '../../components/pagination'
 
-import { searchArtistByParamsAPI, albumsByArtistAPI } from '../../api/services'
-
-const artistsInitialState = {
-  artists: [],
-  total: 0
-}
-
-const artistInitialState = {
-  artistId: null,
-  artistName: '',
-  artistAlbums: [],
-  total: 0
-}
+import { searchArtistsByParamsAPI, albumsByArtistIdAPI } from '../../api/services'
 
 const links = [{ name: 'Buscar', path: '/artists', status: true }, { name: 'My albums', path: '/my-albums', status: false },]
 
+const initialDataState = {
+  artists: {
+    items: [],
+    total: 0,
+  },
+  artist: {
+    id: null,
+    name: '',
+    albums: [],
+    total: 0,
+  },
+}
+
+const initialCurrentPageState = 0
+
+const initialArtistDetailsToDisplay = {
+  details: {
+    id: null,
+    name: '',
+    followers: 0,
+    image: null,
+  },
+  isDisplayed: false
+}
+
+const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
+
 const Artists = () => {
+  /* Contexts hooks */
   const { auth: { accessToken } } = useAuthContext()
   const { albumsByArtists, setAlbum, removeAlbum } = useStorageContext()
+
+  /* Screen custom hook */
+  const { width: screenWidth } = useScreen()
+
+  const [data, setData] = useState(initialDataState)
+
+  /* Search artists by text state */
   const [searchText, setSearchText] = useState('')
 
-  // Loader state
-  const [isLoading, setIsLoading] = useState(false)
-
-  // List of artists
-  const [artistsList, setArtistsList] = useState(artistsInitialState)
-  
-  // Any artist
-  const [artist, setArtist] = useState(artistInitialState)
-
-  // Pagination state & logic
-  const [currentPage, setCurrentPage] = useState(0)
+  /* Pagination state & logic */
+  const [currentPage, setCurrentPage] = useState(initialCurrentPageState)
   const perPage = 4
   const limit = (currentPage + 1) * perPage
   const offset = limit - perPage
-  
-  // define page count | if artistId is selected show albums length in other ways show artist list length
-  const itemsCount = !artist.artistId ? artistsList.total : artist.total
+  const itemsCount = !data.artist.id ? data.artists.total : data.artist.total
   const pageCount = Math.ceil(itemsCount / perPage)
 
+  /* Request loading state */
+  const [isLoading, setIsLoading] = useState(false)
+
+  /* Display artist details state */
+  const [artistDetailsToDisplay, setArtistDetailsToDisplay] = useState(initialArtistDetailsToDisplay)
+
   useEffect(() => {
-    if (!artist.artistId) {
-      artistsByParams()
-    } else {
-      albumsByArtist()
-    }
+    handleRequest()
   }, [currentPage])
 
-  const searchArtistByParams = async () => {
-    setCurrentPage(0)
-    setArtist(artistInitialState)
+  useEffect(() => {
+    searchAlbumsByArtistId(true)
+  }, [data.artist.id])
 
+  useEffect(() => {
+    if (screenWidth < 768 && currentPage !== 0) {
+        searchAlbumsByArtistId(true)
+    } else {
+        searchArtistsByParams(true)
+    }
+  }, [screenWidth])
+
+  const handleRequest = () => {
+    const { id: artistId } = data.artist
+
+    if (!artistId || screenWidth >= 768) {
+      return searchArtistsByParams()
+    }
+    searchAlbumsByArtistId()
+  }
+
+  const searchArtistsByParams = async (initialSearch = false) => {
     if (!searchText) {
       return
     }
 
-    const artistsRequestParams = [{ type: 'artist', }, { q: searchText }, { limit }, { offset }]
-
-    setIsLoading(true)
-
-    const artistsResponse = await searchArtistByParamsAPI(artistsRequestParams, accessToken)
-    const { artists, error } = artistsResponse
-    
-    setIsLoading(false)
-    
-    if (error) {
-      console.log(artistsResponse) // error = { status, message }
-      return alert('error')
+    /* Reset states */
+    if (initialSearch) {
+      setCurrentPage(0)
+      setData(initialDataState)
     }
 
-    if (artists?.items?.length > 0) {
-      return setArtistsList({ artists: artists.items, total: artists.total })
+    const paginationLimit  = initialSearch ? perPage : limit - offset
+    const paginationOffset = initialSearch ? initialCurrentPageState : offset
+
+    /* Request params */
+    const params = [{ type: 'artist', }, { q: searchText }, { limit: paginationLimit }, { offset: paginationOffset }]
+
+    const response = await searchArtistsByParamsAPI(params, accessToken)
+
+    if (response?.artists?.items?.length) {
+      const { artists: { items, total } } = response
+      const artistIndex = items.findIndex((elem) => elem.name === searchText)
+      
+      // We cant found albums, only set Artists
+      if (artistIndex === -1) {
+        return setData((state) => ({ ...state, artists: { ...state.artists, items, total } }))
+      }
+      
+      /* Extract artist data */
+      const { id, name } = items[artistIndex]
+
+      /* Set individual artists & all artists founded */
+      return setData((state) => ({ ...state, artists: { ...state.artists, items, total }, artist: { ...state.artist, id, name }, }))
     }
   }
 
-  const artistsByParams = async () => {
-    if (!searchText) {
+  const searchAlbumsByArtistId = async (initialSearch = false) => {
+    if (!data.artist.id) {
       return
     }
 
-    const artistsRequestParams = [{ type: 'artist', }, { q: searchText }, { limit }, { offset }]
-
-    setIsLoading(true)
-
-    const artistsResponse = await searchArtistByParamsAPI(artistsRequestParams, accessToken)
-    const { artists, error } = artistsResponse
-    
-    setIsLoading(false)
-    
-    
-    if (error) {
-      console.log(artistsResponse) // error = { status, message }
-      return alert('error')
+    if (initialSearch) {
+      setCurrentPage(0) 
     }
 
-    if (artists?.items?.length > 0) {
-      return setArtistsList({ artists: artists.items, total: artists.total })
+    const paginationLimit  = initialSearch ? perPage : limit - offset
+    const paginationOffset = initialSearch ? initialCurrentPageState : offset
+
+    const params = [{ limit: paginationLimit }, { offset: paginationOffset }]
+
+    const response = await albumsByArtistIdAPI(params, data.artist.id, accessToken)
+    const { items, total } = response
+    
+    if (items?.length) {
+      setData((state) => ({ ...state, artist: { ...state.artist, albums: items, total } }))
     }
   }
 
-  const searchAlbumsByArtist = async (artistId, artistName) => {
-    setCurrentPage(0)
-    
-    // reset current page to 0 but we pass number to 1
-    const limit = 1 * perPage
-    const offset = limit - perPage
-    
-    const albumsRequestParams = [{ limit }, { offset }]
-    
-    setIsLoading(true)
-
-    const response = await albumsByArtistAPI(albumsRequestParams, artistId, accessToken)
-
-    const artistAlbums = response?.items
-    const total = response?.total
-
-    setIsLoading(false)
-
-    if (artistAlbums && artistAlbums.length > 0) {
-      return setArtist({ artistId, artistName, artistAlbums, total })
-    }
+  const selectArtistHandler = (id, name, followers, image) => {
+    setArtistDetailsToDisplay({ details: { id, name, followers, image }, isDisplayed: true })
   }
 
-  const albumsByArtist = async () => {
-    setIsLoading(true)
-    
-    const albumsRequestParams = [{ limit }, { offset }]
-    
-    const response = await albumsByArtistAPI(albumsRequestParams, artist.artistId, accessToken)
-    
-    const artistAlbums = response?.items
-    const total = response?.total
-    
-    setIsLoading(false)
-
-    if (artistAlbums && artistAlbums.length > 0) {
-      return setArtist((state) => ({ ...state, artistAlbums, total }))
-    }
-  }
-
-  const handlePagination = (item) => {
+  const paginationHandler = (item) => {
     setCurrentPage(item.selected)
-  }
+  } 
+
+  const loader = <div className='mt-10 text-center'><Loader /></div>
 
   return (
     <>
       <Header links={links} />
-      
-      <div className='p-6 md:flex md:flex-col'>
-        <div className='md:text-center'>
-          <h1 className="mt-5 text-4xl font-bold md:text-6xl">
-            <span className='text-white'>Busca tus</span><br /><span style={{ color: '#D6F379' }}>artistas</span>
-          </h1>
 
-          <span className='block mt-6 leading-8 text-white'>
-            <span className='md:hidden'>Encuentra tus artistas favoritos gracias a nuestro buscador y guarda tus álbumes favoritos</span>
-            <span className='hidden md:block'>Encuentra tus artistas favoritos gracias a nuestro<br/>buscador y guarda tus álbumes favoritos</span>
-          </span>
-        </div>
+      {artistDetailsToDisplay.isDisplayed 
+        ?
+        <ArtistDetails {...artistDetailsToDisplay.details} />
+        :
+        <div className="p-6 md:px-20 md:flex md:flex-col">
+          <div className='md:text-center'>
+            <h1 className="mt-5 text-4xl font-bold md:text-6xl">
+              <span className='text-white'>Busca tus</span><br /><span style={{ color: '#D6F379' }}>artistas</span>
+            </h1>
 
-        <div>
-          <div className='flex mt-8 p-2 rounded-3xl bg-white md:max-w-xl lg:max-w-2xl mx-auto'>
-            <input className='w-full outline-0 px-6 font-semibold' type="text" placeholder="Nombre de artista..." onChange={(e) => setSearchText(e.target.value)} />
-            <button 
-              type='button' 
-              className='h-12 px-6 rounded-3xl font-semibold text-black cursor-pointer' 
-              style={{ minWidth: 150, backgroundColor: '#D6F379' }}
-              onClick={searchArtistByParams}
-              >
-              Search
-            </button>
+            <span className='block mt-6 leading-8 text-white'>
+              <span className='md:hidden'>Encuentra tus artistas favoritos gracias a nuestro buscador y guarda tus álbumes favoritos</span>
+              <span className='hidden md:block'>Encuentra tus artistas favoritos gracias a nuestro<br/>buscador y guarda tus álbumes favoritos</span>
+            </span>
           </div>
-        </div>
 
-        <div className='md:px-20'>
-          {isLoading && (
-            <div className='mt-10 text-center'>
-              <Loader />
+          <div>
+            <div className='flex mt-8 p-2 rounded-3xl bg-white md:max-w-xl lg:max-w-2xl mx-auto'>
+              <input className='w-full outline-0 px-6 font-semibold' type="text" placeholder="Nombre de artista..." onChange={(e) => setSearchText(e.target.value)} />
+              <button type='button' className='h-12 px-6 rounded-3xl font-semibold text-black cursor-pointer' style={{ minWidth: 150, backgroundColor: '#D6F379' }} onClick={() => searchArtistsByParams(true)}>
+                Search
+              </button>
             </div>
-          )}
+          </div>
 
-          {!isLoading && (
+          {isLoading 
+            ? loader
+            : 
             <>
-              {!artist.artistId && (
-                <>
-                  {artistsList.artists.length > 0 && (
-                    <span className='block mt-11 leading-8 text-white'>
-                      Mostrando {perPage} resultados de {artistsList.total}
-                    </span>
-                  )}
-                  
-                  <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-18 justify-items-center content-center'>
-                    {artistsList.artists.slice(offset, limit).map(({ id, name, followers: { total }, images }) => {
-                      const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
-                      const url = images?.[0]?.url || notFoundImageUrl
-
-                      return <ArtistCard key={id} id={id} image={url} name={name} followers={total} getAlbums={searchAlbumsByArtist} />
-                    })}
-                  </div>
-
-                  {artistsList.artists.length > 0 && (
-                    <div className='mt-8 md:mt-12 flex justify-center md:justify-start'>
-                      <Pagination 
-                        currentPage={currentPage} 
-                        pageCount={pageCount} 
-                        onChange={handlePagination} 
-                      />
-                    </div>
-                  )}
-
-                </>
-              )}
-
-              {/* ------------------------ Display albums by Artist ------------------------ */}
-
-              {artist.artistId && (
+              {/* Show albums by selected artist */}
+              {screenWidth < 768 && data.artist.id
+                ? 
                 <>
                   <span className='block mt-11 leading-8 text-white'>
-                    Guarda tus álbumes favoritos de {artist.artistName}
+                    Guarda tus álbumes favoritos de {data.artist.name}
                   </span>
-
+                  
                   <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-20 xl:gap-4 justify-items-center content-center'>
-                    {artist.artistAlbums.map((album) => {
+                    {data.artist.albums.map((album) => {
                       const { id, images, name, release_date } = album
-                      const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
                       const url = images?.[0]?.url || notFoundImageUrl
 
-                      const artistIndex = albumsByArtists.findIndex((element) => element.artistId === artist.artistId)
-                      let albumIsAdded = false
-                      
-                      if (artistIndex !== -1) {
-                        albumIsAdded = albumsByArtists[artistIndex].albums.some((element) => element.id === id)
-                      }
+                        const artistIndex = albumsByArtists.findIndex((element) => element.artistId === data.artist.id)
+                        let albumIsAdded = false
+                        
+                        if (artistIndex !== -1) {
+                          albumIsAdded = albumsByArtists[artistIndex].albums.some((element) => element.id === id)
+                        }
 
-                      return (
-                        <AlbumCard key={id} id={id} image={url} name={name} publishedDate={release_date}>
-                          {!albumIsAdded && (
-                            <Button 
-                              classname='mt-6' 
-                              backgroundColor='#D6F379' 
-                              color='#000' 
-                              onClick={() => setAlbum(artist.artistId, artist.artistName, album)}>
-                                + Add album
-                            </Button>
-                          )}
+                        return (
+                          <AlbumCard key={id} id={id} image={url} name={name} publishedDate={release_date}>
+                            {!albumIsAdded 
+                              ?
+                              <Button 
+                                classname='mt-6' 
+                                backgroundColor='#D6F379' 
+                                color='#000' 
+                                onClick={() => setAlbum(data.artist.id, data.artist.name, album)}>
+                                  + Add album
+                              </Button>
+                              :
+                              <Button 
+                                classname='mt-6' 
+                                backgroundColor='#E3513D' 
+                                color='#fff' 
+                                onClick={() => removeAlbum(data.artist.id, album)}>
+                                  - Remove album
+                              </Button>
+                            }
+                          </AlbumCard>
+                        )
+                      })}
+                    </div>
 
-                          {albumIsAdded && (
-                             <Button 
-                              classname='mt-6' 
-                              backgroundColor='#E3513D' 
-                              color='#fff' 
-                              onClick={() => removeAlbum(artist.artistId, album)}>
-                                - Remove album
-                            </Button>
-                          )}
-                        </AlbumCard>
-                      )
+                    {data.artist.albums.length > 0 && (
+                      <div className='mt-12 flex justify-center md:justify-start'>
+                        <Pagination currentPage={currentPage} pageCount={pageCount} onChange={paginationHandler} />
+                      </div>
+                    )}
+                </>
+                :
+                <>
+                  {data.artists.items.length > 0 && (
+                    <span className='block mt-11 leading-8 text-white'>
+                      Mostrando {perPage} resultados de {data.artists.total}
+                    </span>
+                  )}
+
+                  <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-18 justify-items-center content-center'>
+                    {data.artists.items.map(({ id, name, followers: { total }, images }) => {
+                      const url = images?.[0]?.url || notFoundImageUrl
+                      return <ArtistCard key={id} image={url} name={name} followers={total} onClick={() => selectArtistHandler(id, name, total, url )} />
                     })}
-
                   </div>
-                  
-                  {artist.artistAlbums.length > 0 && (
-                    <div className='mt-12'>
-                      <Pagination 
-                        currentPage={currentPage} 
-                        pageCount={pageCount} 
-                        onChange={handlePagination} 
-                      />
+
+                  {data.artists.items.length > 0 && (
+                    <div className='mt-12 flex justify-center md:justify-start'>
+                      <Pagination currentPage={currentPage} pageCount={pageCount} onChange={paginationHandler} />
                     </div>
                   )}
                 </>
-              )}
-
-
-
+              }
             </>
-          )}
+          }
         </div>
-      </div>
+      }
     </>
   )
 }

@@ -29,13 +29,13 @@ export const spotifyLoginAPI = async (requiredParams) => {
   }
 }
 
-export const searchArtistByParamsAPI = async (queries, token) => {
+export const searchArtistsByParamsAPI = async (params, token) => {
   try {    
     //- Request URL
     const url = new URL('https://api.spotify.com/v1/search')
     
     //- Request queries
-    for (const element of queries) {
+    for (const element of params) {
       const key = Object.keys(element)[0]
       url.searchParams.append(key, element[key])
     }
@@ -55,12 +55,12 @@ export const searchArtistByParamsAPI = async (queries, token) => {
   }
 }
 
-export const albumsByArtistAPI = async (queries, artistId, token) => {
+export const albumsByArtistIdAPI = async (params, artistId, accessToken) => {
   try {
     const url = new URL(`https://api.spotify.com/v1/artists/${artistId}/albums`)
 
     //- Request queries
-    for (const element of queries) {
+    for (const element of params) {
       const key = Object.keys(element)[0]
       url.searchParams.append(key, element[key])
     }
@@ -69,7 +69,7 @@ export const albumsByArtistAPI = async (queries, artistId, token) => {
       method: 'GET',
       url,
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       }
     })

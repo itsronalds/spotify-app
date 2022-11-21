@@ -1,10 +1,11 @@
 import Header from "../../components/header"
-import AlbumCard from "../../components/albumCard"
 import Button from "../../components/button"
-
+import AlbumCard from "../../components/albumCard"
 import { useStorageContext } from '../../contexts/store'
 
 const links = [{ name: 'Buscar', path: '/artists', status: false }, { name: 'My albums', path: '/my-albums', status: true },]
+
+const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
 
 const MyAlbums = () => {
   const { albumsByArtists, removeAlbum } = useStorageContext()
@@ -31,23 +32,18 @@ const MyAlbums = () => {
               <div key={artist.artistId}>
                 <h3 className="text-3xl font-bold text-white">{artist.artistName}</h3>
                 <div className="mt-6 grid gap-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-16">
-                    {artist.albums?.map((album) => {
-                      const { id, images, name, release_date } = album
-                      const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
-                      const url = images?.[0]?.url || notFoundImageUrl
+                  {artist.albums?.map((album) => {
+                    const { id, images, name, release_date } = album
+                    const url = images?.[0]?.url || notFoundImageUrl
 
-                      return (
-                        <AlbumCard key={id} id={id} image={url} name={name} publishedDate={release_date}>
-                          <Button 
-                            classname='mt-6' 
-                            backgroundColor='#E3513D' 
-                            color='#fff' 
-                            onClick={() => removeAlbum(artist.artistId, album)}>
-                            - Remove album
-                          </Button>
-                        </AlbumCard>
-                      )
-                    })}
+                    return (
+                      <AlbumCard key={id} id={id} image={url} name={name} publishedDate={release_date}>
+                        <Button classname='mt-6' backgroundColor='#E3513D' color='#fff' onClick={() => removeAlbum(artist.artistId, album)}>
+                          - Remove album
+                        </Button>
+                      </AlbumCard>
+                    )
+                  })}
                 </div>
               </div>
             )
