@@ -112,7 +112,11 @@ const Artists = () => {
     /* Request params */
     const params = [{ type: 'artist', }, { q: searchText }, { limit: paginationLimit }, { offset: paginationOffset }]
 
+    setIsLoading(true)
+
     const response = await searchArtistsByParamsAPI(params, accessToken)
+
+    setIsLoading(false)
 
     if (response?.artists?.items?.length) {
       const { artists: { items, total } } = response
@@ -145,10 +149,14 @@ const Artists = () => {
 
     const params = [{ limit: paginationLimit }, { offset: paginationOffset }]
 
+    setIsLoading(true)
+
     const response = await albumsByArtistIdAPI(params, data.artist.id, accessToken)
-    const { items, total } = response
     
-    if (items?.length) {
+    setIsLoading(false)
+    
+    if (response?.items?.length) {
+      const { items, total } = response
       setData((state) => ({ ...state, artist: { ...state.artist, albums: items, total } }))
     }
   }
