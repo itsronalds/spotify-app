@@ -5,7 +5,6 @@ import ArtistsPage from './pages/artists'
 import MyAlbums from './pages/myAlbums'
 
 import { useAuthContext } from './contexts/auth'
-import { StoreContextProvider } from './contexts/store'
 
 const NoAuthRoutes = () => (
   <Router>
@@ -19,9 +18,9 @@ const NoAuthRoutes = () => (
 const AuthRoutes = () => (
   <Router>
     <Routes>
-      <Route path='/artists' element={<StoreContextProvider><ArtistsPage /></StoreContextProvider>} />
-      <Route path='/my-albums' element={<StoreContextProvider><MyAlbums /></StoreContextProvider>} />
-      <Route path='*' element={<StoreContextProvider><ArtistsPage /></StoreContextProvider>} />
+      <Route path='/artists'   element={<ArtistsPage />} />
+      <Route path='/my-albums' element={<MyAlbums />} />
+      <Route path='*'          element={<ArtistsPage />} />
     </Routes>
   </Router>
 )
