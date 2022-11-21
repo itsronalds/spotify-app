@@ -7,9 +7,6 @@ import Header from '../../components/header'
 import ArtistCard from '../../components/artistCard'
 import AlbumCard from '../../components/albumCard'
 import Loader from '../../components/loader'
-import ReactPaginate from 'react-paginate';
-import PaginationArrowRight from '../../assets/icons/PaginationArrowRight'
-import PaginationArrowLeft from '../../assets/icons/PaginationArrowLeft'
 import Button from '../../components/button'
 import Pagination from '../../components/pagination'
 
