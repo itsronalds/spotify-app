@@ -7454,11 +7454,6 @@ react-paginate@^8.1.4:
   dependencies:
     prop-types "^15"
 
-react-pagination-bar@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/react-pagination-bar/-/react-pagination-bar-2.0.1.tgz#1d667e37b05f883a7312fe574061aca99ac7caa5"
-  integrity sha512-yOjuGhH/4V2ya0Jw6wQqOD1qDbLVBjRdWPMFkdvAg4i8O9lEN/fMIeUk0Bn05APJn9cK7RVUjfyFLTd5PnIxZQ==
-
 react-refresh@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.11.0.tgz#77198b944733f0f1f1a90e791de4541f9f074046"
