@@ -1,70 +1,32 @@
-# Getting Started with Create React App
+# Music App
+Aplicación de Musica desarrollada con React.js y la Open API de Spotify
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![img](https://user-images.githubusercontent.com/77751686/203214278-72bc3ccd-2bbf-4675-995c-fd544e4cb1f2.png)
 
-## Available Scripts
+## Requirements
+Debes tener instalado en tu PC [Node.js](https://nodejs.org/en/) y [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable), además debes tener una cuenta en [Spotify for developers](https://developer.spotify.com/dashboard/)
 
-In the project directory, you can run:
+### Spotify
+A continuación en este [enlace](https://developer.spotify.com/documentation/web-api/) podrás conocer un poco más acerca de la API de Spotify y revusar las instrucciones necesarias para registrar una app y tomar las credenciales que vamos a necesitar más adelante
 
-### `yarn start`
+## Clone project
+```
+git clone https://github.com/LancerR40/ronald_abusaleh_full-stack.git
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Install dependencies
+```
+cd <project_name> && yarn
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Setup environment variables
+En la raíz del proyecto crea un nuevo archivo llamado .env y pega todas las variables que verás en el archivo .env.example dentro del .env. Luego desdel el Dashboard de Spotify al crear y registrar una app tomaremos los valores de:
+* Client ID
+* Client Secret
+* Redirect URIs
+Luego de colocar las credenciales correctas nuestro proyecto estará listo para funcionar
 
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Run project
+```
+yarn start
+```
