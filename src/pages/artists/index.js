@@ -41,7 +41,24 @@ const initialArtistDetailsToDisplay = {
   isDisplayed: false
 }
 
+const initialRequestErrorState = {
+  status: null,
+  message: '',
+}
+
 const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
+
+const NOT_FOUND = {
+  status: 404,
+  message: 'No se han encontrado resultados',
+}
+
+const Message = ({ status, message }) => (
+  <div className='mt-16 text-center text-white'>
+    <h3 className='text-5xl font-semibold'>{status}</h3>
+    <span>{message}</span>
+  </div>
+)
 
 const Artists = () => {
   /* Contexts hooks */
@@ -72,6 +89,9 @@ const Artists = () => {
 
   /* Display artist details state */
   const [artistDetailsToDisplay, setArtistDetailsToDisplay] = useState(initialArtistDetailsToDisplay)
+
+  /* Request error state */
+  const [requestError, setRequestError] = useState(initialRequestErrorState)
 
   useEffect(() => {
     handleRequest()
@@ -107,6 +127,8 @@ const Artists = () => {
       return
     }
 
+    setRequestError(initialRequestErrorState)
+
     /* Reset states */
     if (initialSearch) {
       setCurrentPage(0)
@@ -134,6 +156,8 @@ const Artists = () => {
       if (status === 401 || status === 403) {
         window.location.href = '/'
       }
+
+      return
     }
 
     if (response?.artists?.items?.length) {
@@ -142,6 +166,7 @@ const Artists = () => {
       
       // We cant found albums, only set Artists
       if (artistIndex === -1) {
+        setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.message  })
         return setData((state) => ({ ...state, artists: { ...state.artists, items, total } }))
       }
       
@@ -151,12 +176,16 @@ const Artists = () => {
       /* Set individual artists & all artists founded */
       return setData((state) => ({ ...state, artists: { ...state.artists, items, total }, artist: { ...state.artist, id, name }, }))
     }
+
+    setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.message  })
   }
 
   const searchAlbumsByArtistId = async (initialSearch = false) => {
     if (!data.artist.id) {
       return
     }
+
+    setRequestError(initialRequestErrorState)
 
     if (initialSearch) {
       setCurrentPage(0) 
@@ -182,12 +211,16 @@ const Artists = () => {
       if (status === 401 || status === 403) {
         window.location.href = '/'
       }
+
+      return
     }
     
     if (response?.items?.length) {
       const { items, total } = response
-      setData((state) => ({ ...state, artist: { ...state.artist, albums: items, total } }))
+      return setData((state) => ({ ...state, artist: { ...state.artist, albums: items, total } }))
     }
+
+    setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.message  })
   }
 
   const selectArtistHandler = (id, name, followers, image) => {
@@ -234,76 +267,85 @@ const Artists = () => {
             : 
             <>
               {/* Show albums by selected artist */}
-              {screenWidth < 768 && data.artist.id
+              {screenWidth < 768
                 ? 
                 <>
-                  <span className='block mt-11 leading-8 text-white'>
-                    Guarda tus álbumes favoritos de {data.artist.name}
-                  </span>
-                  
-                  <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-20 xl:gap-4 justify-items-center content-center'>
-                    {data.artist.albums.map((album) => {
-                      const { id, images, name, release_date } = album
-                      const url = images?.[0]?.url || notFoundImageUrl
+                  {data.artist.albums.length > 0 
+                    ?
+                    <>
+                      <span className='block mt-11 leading-8 text-white'>
+                        Guarda tus álbumes favoritos de {data.artist.name}
+                      </span>
 
-                        const artistIndex = albumsByArtists.findIndex((element) => element.artistId === data.artist.id)
-                        let albumIsAdded = false
-                        
-                        if (artistIndex !== -1) {
-                          albumIsAdded = albumsByArtists[artistIndex].albums.some((element) => element.id === id)
-                        }
+                      <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-20 xl:gap-4 justify-items-center content-center'>
+                        {data.artist.albums.map((album) => {
+                          const { id, images, name, release_date } = album
+                          const url = images?.[0]?.url || notFoundImageUrl
+  
+                          const artistIndex = albumsByArtists.findIndex((element) => element.artistId === data.artist.id)
+                          let albumIsAdded = false
+                          
+                          if (artistIndex !== -1) {
+                            albumIsAdded = albumsByArtists[artistIndex].albums.some((element) => element.id === id)
+                          }
+  
+                          return (
+                            <AlbumCard key={id} id={id} image={url} name={name} publishedDate={release_date}>
+                              {!albumIsAdded 
+                                ?
+                                <Button 
+                                  classname='mt-6' 
+                                  backgroundColor='#D6F379' 
+                                  color='#000' 
+                                  onClick={() => setAlbum(data.artist.id, data.artist.name, album)}>
+                                    + Add album
+                                </Button>
+                                :
+                                <Button 
+                                  classname='mt-6' 
+                                  backgroundColor='#E3513D' 
+                                  color='#fff' 
+                                  onClick={() => removeAlbum(data.artist.id, album)}>
+                                    - Remove album
+                                </Button>
+                              }
+                            </AlbumCard>
+                          )
+                        })}
+                      </div>
 
-                        return (
-                          <AlbumCard key={id} id={id} image={url} name={name} publishedDate={release_date}>
-                            {!albumIsAdded 
-                              ?
-                              <Button 
-                                classname='mt-6' 
-                                backgroundColor='#D6F379' 
-                                color='#000' 
-                                onClick={() => setAlbum(data.artist.id, data.artist.name, album)}>
-                                  + Add album
-                              </Button>
-                              :
-                              <Button 
-                                classname='mt-6' 
-                                backgroundColor='#E3513D' 
-                                color='#fff' 
-                                onClick={() => removeAlbum(data.artist.id, album)}>
-                                  - Remove album
-                              </Button>
-                            }
-                          </AlbumCard>
-                        )
-                      })}
-                    </div>
-
-                    {data.artist.albums.length > 0 && (
                       <div className='mt-12 flex justify-center md:justify-start'>
                         <Pagination currentPage={currentPage} pageCount={pageCount} onChange={paginationHandler} />
                       </div>
-                    )}
+                    </>
+                    :
+                    <Message {...requestError} />
+                  }
                 </>
                 :
                 <>
-                  {data.artists.items.length > 0 && (
-                    <span className='block mt-11 leading-8 text-white'>
-                      Mostrando {perPage} resultados de {data.artists.total}
-                    </span>
-                  )}
+                  {/* Show artists list */}
+                  {data.artists.items.length > 0
+                    ?
+                    <>
+                      <span className='block mt-11 leading-8 text-white'>
+                        Mostrando {perPage} resultados de {data.artists.total}
+                      </span>
 
-                  <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-18 justify-items-center content-center'>
-                    {data.artists.items.map(({ id, name, followers: { total }, images }) => {
-                      const url = images?.[0]?.url || notFoundImageUrl
-                      return <ArtistCard key={id} image={url} name={name} followers={total} onClick={() => selectArtistHandler(id, name, total, url )} />
-                    })}
-                  </div>
+                      <div className='mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 md:gap-16 lg:gap-18 justify-items-center content-center'>
+                        {data.artists.items.map(({ id, name, followers: { total }, images }) => {
+                          const url = images?.[0]?.url || notFoundImageUrl
+                          return <ArtistCard key={id} image={url} name={name} followers={total} onClick={() => selectArtistHandler(id, name, total, url )} />
+                        })}
+                      </div>
 
-                  {data.artists.items.length > 0 && (
-                    <div className='mt-12 flex justify-center md:justify-start'>
-                      <Pagination currentPage={currentPage} pageCount={pageCount} onChange={paginationHandler} />
-                    </div>
-                  )}
+                      <div className='mt-12 flex justify-center md:justify-start'>
+                        <Pagination currentPage={currentPage} pageCount={pageCount} onChange={paginationHandler} />
+                      </div>
+                    </>
+                    :
+                    <Message status={NOT_FOUND.status} message={NOT_FOUND.message} />
+                  }
                 </>
               }
             </>
