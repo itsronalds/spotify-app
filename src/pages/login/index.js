@@ -19,11 +19,6 @@ const LoginPage = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Remove saved albums artists 
-    window.localStorage.clear()
-  }, [])
-
-  useEffect(() => {
     spotifyAuthentication()
   }, [window.location.search])
 
@@ -53,6 +48,9 @@ const LoginPage = () => {
         const { access_token, refresh_token } = response.data
 
         navigate('/artists')
+
+        // Set access token in localStorage
+        window.localStorage.setItem('auth', JSON.stringify({ accessToken: access_token, refreshToken: refresh_token }))
 
         // Set data to Auth context state
         return setAuth({ isAuth: true, accessToken: access_token, refreshToken: refresh_token })

@@ -11,6 +11,7 @@ const Header = ({ links }) => {
   const { width: screenWidth } = useScreen()
 
   const logout = () => {
+    window.localStorage.clear()
     window.location.href = '/'
   }
 
