@@ -45,13 +45,13 @@ const initialRequestErrorState = {
   status: null,
   message: '',
 }
-
-const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
-
 const NOT_FOUND = {
   status: 404,
-  message: 'No se han encontrado resultados',
+  artists: 'No se han encontrado resultados de artistas',
+  albums: 'No se han encontrado resultados de albums',
 }
+
+const notFoundImageUrl = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png'
 
 const Message = ({ status, message }) => (
   <div className='mt-16 text-center text-white'>
@@ -82,6 +82,8 @@ const Artists = () => {
   const limit = (currentPage + 1) * perPage
   const offset = limit - perPage
   const itemsCount = !data.artist.id ? data.artists.total : data.artist.total
+  // const itemsCount = screenWidth >= 768 ? data.artists.total : data.artist.total
+  
   const pageCount = Math.ceil(itemsCount / perPage)
 
   /* Request loading state */
@@ -138,6 +140,8 @@ const Artists = () => {
     const paginationLimit  = initialSearch ? perPage : limit - offset
     const paginationOffset = initialSearch ? initialCurrentPageState : offset
 
+    // console.log(paginationOffset, paginationLimit)
+
     /* Request params */
     const params = [{ type: 'artist', }, { q: searchText }, { limit: paginationLimit }, { offset: paginationOffset }]
 
@@ -166,7 +170,7 @@ const Artists = () => {
       
       // We cant found albums, only set Artists
       if (artistIndex === -1) {
-        setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.message  })
+        setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.albums  })
         return setData((state) => ({ ...state, artists: { ...state.artists, items, total } }))
       }
       
@@ -177,7 +181,7 @@ const Artists = () => {
       return setData((state) => ({ ...state, artists: { ...state.artists, items, total }, artist: { ...state.artist, id, name }, }))
     }
 
-    setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.message  })
+    setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.artists  })
   }
 
   const searchAlbumsByArtistId = async (initialSearch = false) => {
@@ -220,7 +224,7 @@ const Artists = () => {
       return setData((state) => ({ ...state, artist: { ...state.artist, albums: items, total } }))
     }
 
-    setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.message  })
+    setRequestError({ status: NOT_FOUND.status, message: NOT_FOUND.albums  })
   }
 
   const selectArtistHandler = (id, name, followers, image) => {
@@ -339,12 +343,14 @@ const Artists = () => {
                         })}
                       </div>
 
-                      <div className='mt-12 flex justify-center md:justify-start'>
-                        <Pagination currentPage={currentPage} pageCount={pageCount} onChange={paginationHandler} />
-                      </div>
+                      {data.artist.id && (
+                        <div className='mt-12 flex justify-center md:justify-start'>
+                         <Pagination currentPage={currentPage} pageCount={pageCount} onChange={paginationHandler} />
+                       </div>
+                      )}
                     </>
                     :
-                    <Message status={NOT_FOUND.status} message={NOT_FOUND.message} />
+                    <Message {...requestError} />
                   }
                 </>
               }
