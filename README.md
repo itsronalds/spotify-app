@@ -1,4 +1,4 @@
-# Music App
+# Spotify App
 Aplicación de Musica desarrollada con React.js y la Open API de Spotify
 
 ![img](https://user-images.githubusercontent.com/77751686/203214278-72bc3ccd-2bbf-4675-995c-fd544e4cb1f2.png)
